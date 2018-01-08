@@ -1,0 +1,186 @@
+{% extends "sm/pages/base.html" %}
+
+{% block content %}
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'home' %}">Panel de Administración</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="nav-item">
+                    {% if username %}
+                        <a href="">Bienvenido, {{ username }}</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Iniciar sesión</a>
+                    {% endif %}
+                </li>
+                {% if username %}
+                <li class="nav-item">
+                    <a href="{% url 'login' %}">Cerrar sesión</a>
+                </li>
+                {% endif %}
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="{% url 'private' %}"><i class="fa fa-lock fa-fw"></i> Sección privada</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Panel de Administración</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-md-10">
+                    <img style="height:300px;width:100%;" src="http://www.mallorcainfo.info/wp-content/themes/Carmen/Carmen/timthumb.php?src=http://www.mallorcainfo.info/wp-content/uploads/2012/02/cuevasdeldrac1.jpg&h=300&w=1000&zc=1" alt="">
+                </div>
+                <div class="col-md-2">
+                    <p>Cambia el tamaño de letra</p>
+                    <select name="" id="page-font-size">
+                        <option value="normal">Normal</option>
+                        <option value="grande">Grande</option>
+                        <option value="gigante">Gigante</option>
+                    </select>
+                    <button id="page-font-size-btn">Guardar</button>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Idiomas frecuentes
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div id="area-chart"></div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-8 -->
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Tendencias
+                        </div>
+                        <div class="panel-body">
+                            <div id="morris-donut-chart"></div>
+                            <button id="update-donut-chart">Cargar tendencias</button>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+{% endblock content %}
+
+{% block extra_js %}
+
+<script>
+        Highcharts.chart('area-chart', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Idioma de clientes'
+        },
+        xAxis: {
+            categories: ['Español', 'Inglés', 'Catalán'],
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Recuento',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' clientes'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: 'Recuento',
+            data: [{{ num_procesados_es_count }}, {{ num_procesados_en_count }}, {{ num_procesados_ca_count }}]
+        }]
+    });
+
+    if(localStorage.getItem('body-font-size')){
+        switch(localStorage.getItem('body-font-size')) {
+            case "normal":
+                $('#page-font-size option:eq(0)').attr('selected', 'selected');
+                break;
+            case "grande":
+                $('#page-font-size option:eq(1)').attr('selected', 'selected');
+                $("body").css("font-size","2rem");
+                break;
+            case "gigante":
+                $('#page-font-size option:eq(2)').attr('selected', 'selected');
+                $("body").css("font-size","3rem");
+                break;
+        }
+    }
+
+    $("#page-font-size-btn").on("click", () => {
+        switch($("#page-font-size").val()) {
+            case "normal":
+                localStorage.setItem('body-font-size', 'normal');
+                break;
+            case "grande":
+                localStorage.setItem('body-font-size', 'grande');
+                break;
+            case "gigante":
+                localStorage.setItem('body-font-size', 'gigante');
+                break;
+        }
+        location.reload();
+    });
+
+</script>
+
+{% endblock extra_js %}
